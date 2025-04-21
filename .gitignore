@@ -1,5 +1,9 @@
 #My additions
 .gitignore
+.vscode/settings.json
+*.mp?
+launch.json
+*.exe
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,13 +1,25 @@
 import argparse
 import os
+import sys
 
 import demucs.api
 import torch
 import whisper
-from moviepy.editor import *
+from moviepy.audio.io.AudioFileClip import AudioFileClip
+from moviepy.audio.AudioClip import CompositeAudioClip
+from moviepy.video.io.VideoFileClip import VideoFileClip
+from moviepy.video.compositing.CompositeVideoClip import CompositeVideoClip
+from moviepy.video.VideoClip import TextClip
 from moviepy.video.tools.subtitles import SubtitlesClip
+from moviepy.audio.fx.volumex import volumex
 
 from moviepy.config import change_settings
+
+try:
+    import moviepy.video.fx.fadein as _fadein
+    sys.modules['moviepy.video.fx.FadeIn'] = _fadein
+except ImportError:
+    pass
 
 from whisper.utils import get_writer
 import platform
@@ -28,7 +40,7 @@ FONT = "./fonts/kg.ttf"
 if platform.system() == "Darwin":
     imagemagick_path = "/opt/homebrew/bin/magick"
 elif platform.system() == "Windows":
-    imagemagick_path = "C:/Program Files/ImageMagick-7.1.1-Q16-HDRI/magick.exe"
+    imagemagick_path = "E:/Program Files/ImageMagick-7.1.1-Q16-HDRI/magick.exe"
 else:
     raise NotImplementedError("Unsupported operating system")
 
@@ -134,8 +146,7 @@ def create(video_path: str):
     vocals_path, music_path = separate_stems(audio_path)
 
     music = AudioFileClip(music_path).set_fps(44100)
-    vocals_audio = AudioFileClip(vocals_path).volumex(
-        VOCAL_VOLUME).set_fps(44100)
+    vocals_audio = AudioFileClip(vocals_path).set_fps(44100).fx(volumex, VOCAL_VOLUME)
 
     combined_audio = CompositeAudioClip([music, vocals_audio])
 
