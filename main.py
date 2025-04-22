@@ -73,7 +73,9 @@ def separate_stems(audio_file_path: str) -> tuple[str, str]:
 
     print(f"Separating vocals from {audio_file_path}")
 
-    separator = demucs.api.Separator(progress=True, jobs=4)
+    # Use GPU if available for faster separation
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    separator = demucs.api.Separator(progress=True, jobs=4, device=device)
 
     _, separated = separator.separate_audio_file(audio_file_path)
 
@@ -196,7 +198,15 @@ def create(video_path: str):
     filename = f"karaoke_{os.path.basename(video_path)}"
     if not os.path.exists("./output"):
         os.makedirs("./output")
-    result.write_videofile(f"./output/{filename}", fps=30, threads=4)
+    # Use GPU hardware encoder if available for faster video encoding
+    codec = "h264_nvenc" if torch.cuda.is_available() else "libx264"
+    result.write_videofile(
+        f"./output/{filename}",
+        fps=30,
+        threads=4,
+        codec=codec,
+        ffmpeg_params=["-preset", "fast"]
+    )
 
     return filename
 

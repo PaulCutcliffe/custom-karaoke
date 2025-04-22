@@ -28,6 +28,12 @@ The Custom Karaoke Python Script is a command-line tool that allows users to cre
     pip install -r requirements.txt
     ```
 
+3. Install an FFmpeg build with NVENC support (Windows):
+   - Download a static FFmpeg build with NVENC enabled from https://www.gyan.dev/ffmpeg/builds/ (look for the "full" or "git full" build).
+   - Extract the archive and copy the `bin\ffmpeg.exe` into your project folder or add the `bin` directory to your system PATH.
+   - Open a new terminal and run `ffmpeg -hwaccels`. You should see `h264_nvenc` listed.
+   - MoviePy will automatically detect and use `h264_nvenc` when CUDA is available.
+
 ## Usage
 
 1. Acquire a video file from YouTube:
