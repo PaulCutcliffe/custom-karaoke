@@ -29,7 +29,7 @@ NUM_PASSES = 1
 VOCAL_VOLUME = 0.05
 VIDEO_WIDTH = 1280
 VIDEO_HEIGHT = 720
-TEXT_WIDTH = 1200
+TEXT_WIDTH = VIDEO_WIDTH - 80
 TEXT_COLOR = "#FFFFFF"
 TEXT_STROKE_COLOR = "#000000"
 TEXT_STROKE_WIDTH = 0.5
@@ -124,6 +124,13 @@ def transcribe(audiofile_path: str, num_passes: int = 1) -> str:
         srt_writer = get_writer("srt", "./subtitles")
         srt_writer(last_result, audiofile_path, highlight_words=True)
 
+        # Replace underline tags with bold tags in the subtitle file
+        with open(subtitle_path, 'r', encoding='utf-8') as f:
+            srt_data = f.read()
+        srt_data = srt_data.replace('<u>', '<b>').replace('</u>', '</b>')
+        with open(subtitle_path, 'w', encoding='utf-8') as f:
+            f.write(srt_data)
+
         return subtitle_path
 
     except Exception as e:
@@ -150,7 +157,7 @@ def create(video_path: str):
 
     combined_audio = CompositeAudioClip([music, vocals_audio])
 
-    background_video = VideoFileClip(video_path, target_resolution=(VIDEO_HEIGHT, VIDEO_HEIGHT)).set_fps(
+    background_video = VideoFileClip(video_path, target_resolution=(VIDEO_HEIGHT, VIDEO_WIDTH)).set_fps(
         30).set_duration(combined_audio.duration)
 
     dimmed_background_video = background_video.fl_image(
